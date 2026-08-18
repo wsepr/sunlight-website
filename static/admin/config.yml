@@ -2,7 +2,7 @@
 
 backend:
   name: github
-  repo: user/repo
+  repo: wsepr/sunlight-website
 
 media_folder: /public/media
 public_folder: /media
