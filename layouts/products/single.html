@@ -1,0 +1,229 @@
+{{ define "main" }}
+{{- $s := hugo.Data.settings -}}
+{{- $imgs := slice -}}
+{{- range .Params.images -}}
+  {{- with $.Resources.GetMatch . }}{{ $imgs = $imgs | append . }}{{ end -}}
+{{- end -}}
+{{- $primary := index $imgs 0 -}}
+{{- $cats := .Params.product_categories | default slice -}}
+{{- $catName := index $cats 0 -}}
+{{- $thumb := "" -}}
+{{- with $primary }}{{ $thumb = (.Process "resize 160x webp q75").RelPermalink }}{{ end -}}
+{{- $wa := printf "https://wa.me/%s?text=%s" (replace $s.contact.whatsapp "+" "") (urlquery (printf "Hello, I'm interested in %s (Model: %s). Could you send me more details?" .Title .Params.model)) -}}
+
+<section class="pt-28 pb-6 md:pt-32">
+  <div class="container-x">
+    {{ partial "breadcrumb.html" (dict "page" . "light" false) }}
+  </div>
+</section>
+
+<section class="pb-16">
+  <div class="container-x grid gap-10 lg:grid-cols-2 lg:gap-14">
+    {{- /* Gallery */}}
+    <div>
+      <div class="gal-main" id="galMainWrap">
+        {{- if $primary }}
+          <img id="galMain" src="{{ ($primary.Process "resize 900x webp q85").RelPermalink }}" alt="{{ .Title }}" width="{{ $primary.Width }}" height="{{ $primary.Height }}" fetchpriority="high" decoding="sync">
+          <span class="absolute right-3 bottom-3 flex items-center gap-1.5 rounded-full bg-navy-950/70 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
+            {{ partial "icon.html" "zoom" }} {{ i18n "product.zoom" }}
+          </span>
+        {{- else }}
+          <span class="flex h-full w-full items-center justify-center text-navy-600/30">{{ partial "icon.html" "image" }}</span>
+        {{- end }}
+      </div>
+      {{- if gt (len $imgs) 1 }}
+      <div class="mt-3 grid grid-cols-4 gap-3">
+        {{- range $i, $img := $imgs }}
+        <button type="button" class="gal-thumb {{ if eq $i 0 }}active{{ end }}" data-full="{{ ($img.Process "resize 1000x webp q85").RelPermalink }}" data-alt="{{ $.Title }}" aria-label="{{ $.Title }} — image {{ add $i 1 }}">
+          <img src="{{ ($img.Process "resize 300x webp q75").RelPermalink }}" alt="" loading="lazy" decoding="async">
+        </button>
+        {{- end }}
+      </div>
+      {{- end }}
+    </div>
+
+    {{- /* Info panel */}}
+    <div>
+      {{- with $catName }}
+        {{- with site.GetPage (printf "/product_categories/%s" (. | urlize)) }}
+        <a href="{{ .RelPermalink }}" class="inline-flex items-center gap-1.5 rounded-full bg-navy-50 px-3 py-1.5 text-xs font-bold tracking-wider text-navy-700 uppercase transition-colors hover:bg-navy-100">
+          {{ .Title }}
+        </a>
+        {{- end }}
+      {{- end }}
+      <h1 class="font-display mt-4 text-3xl leading-tight font-extrabold tracking-tight text-navy-900 md:text-4xl">{{ .Title }}</h1>
+      <p class="pcard-model mt-2 text-sm">{{ i18n "product.model" }}: {{ .Params.model }}</p>
+      <p class="mt-4 text-base leading-relaxed text-ink-soft">{{ .Params.short_description }}</p>
+
+      {{- with .Params.features }}
+      <ul class="mt-6 space-y-2.5 border-t border-line pt-6">
+        {{- range first 5 . }}
+        <li class="flex items-start gap-2.5 text-sm font-medium text-ink">
+          <span class="mt-0.5 shrink-0 text-gold-600">{{ partial "icon.html" "check" }}</span>{{ . }}
+        </li>
+        {{- end }}
+      </ul>
+      {{- end }}
+
+      <div class="mt-6 grid grid-cols-3 gap-3">
+        {{- with .Params.moq }}
+        <div class="card p-4 text-center">
+          <p class="text-xs font-semibold tracking-wider text-ink-soft uppercase">{{ i18n "product.moq" }}</p>
+          <p class="mt-1 font-display text-lg font-extrabold text-navy-900">{{ . }}</p>
+        </div>
+        {{- end }}
+        {{- with .Params.packaging.loading_port }}
+        <div class="card p-4 text-center">
+          <p class="text-xs font-semibold tracking-wider text-ink-soft uppercase">{{ i18n "product.port" }}</p>
+          <p class="mt-1 font-display text-lg font-extrabold text-navy-900">{{ . }}</p>
+        </div>
+        {{- end }}
+        {{- with .Params.packaging.lead_time }}
+        <div class="card p-4 text-center">
+          <p class="text-xs font-semibold tracking-wider text-ink-soft uppercase">{{ i18n "product.lead_time" }}</p>
+          <p class="mt-1 font-display text-lg font-extrabold text-navy-900">{{ . }}</p>
+        </div>
+        {{- end }}
+      </div>
+
+      <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+        <button type="button"
+          class="add-inquiry btn btn-gold flex-1"
+          data-id="{{ .RelPermalink }}"
+          data-name="{{ .Title }}"
+          data-model="{{ .Params.model }}"
+          data-url="{{ .RelPermalink }}"
+          data-img="{{ $thumb }}"
+          data-added="{{ i18n "product.added" }}"
+        >
+          {{ partial "icon.html" "plus" }} {{ i18n "product.add_to_inquiry" }}
+        </button>
+        <a href="#inquiry-form" class="btn btn-navy flex-1">{{ partial "icon.html" "send" }} {{ i18n "product.send_inquiry" }}</a>
+        <a href="{{ $wa }}" class="btn btn-outline" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+          {{ partial "icon.html" "whatsapp" }}
+        </a>
+      </div>
+
+      <div class="mt-6 flex items-center gap-2 border-t border-line pt-5">
+        <span class="text-xs font-bold tracking-wider text-ink-soft uppercase">{{ i18n "product.share" }}</span>
+        <a href="{{ $wa }}" target="_blank" rel="noopener noreferrer" class="icon-btn" aria-label="Share on WhatsApp">{{ partial "icon.html" "whatsapp" }}</a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ .Permalink }}" target="_blank" rel="noopener noreferrer" class="icon-btn" aria-label="Share on Facebook">{{ partial "icon.html" "facebook" }}</a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ .Permalink }}" target="_blank" rel="noopener noreferrer" class="icon-btn" aria-label="Share on LinkedIn">{{ partial "icon.html" "linkedin" }}</a>
+        <a href="mailto:?subject={{ .Title }}&body={{ .Permalink }}" class="icon-btn" aria-label="Share by email">{{ partial "icon.html" "mail" }}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{- /* Specifications */}}
+{{- with .Params.specifications }}
+<section class="bg-mist py-16">
+  <div class="container-x max-w-4xl">
+    <p class="eyebrow eyebrow-dark">Details</p>
+    <h2 class="section-title mt-4 mb-8">{{ i18n "product.specifications" }}</h2>
+    <div class="card overflow-hidden">
+      <table class="specs-table">
+        <tbody>
+          {{- range . }}
+          <tr>
+            <th scope="row">{{ .label }}</th>
+            <td>{{ .value }}</td>
+          </tr>
+          {{- end }}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{{- end }}
+
+{{- /* Description + packaging */}}
+<section class="py-16">
+  <div class="container-x max-w-4xl">
+    <p class="eyebrow eyebrow-dark">Overview</p>
+    <h2 class="section-title mt-4">{{ i18n "product.overview" }}</h2>
+    <div class="rich mt-6">{{ .Content }}</div>
+
+    {{- with .Params.packaging }}
+    <div class="mt-12">
+      <h3 class="font-display text-xl font-extrabold text-navy-900">{{ i18n "product.packaging_delivery" }}</h3>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {{- with .loading_port }}
+        <div class="card p-5">
+          <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-navy-50 text-navy-700">{{ partial "icon.html" "truck" }}</span>
+          <p class="mt-3 text-xs font-bold tracking-wider text-ink-soft uppercase">{{ i18n "product.port" }}</p>
+          <p class="mt-1 text-sm font-semibold text-navy-900">{{ . }}</p>
+        </div>
+        {{- end }}
+        {{- with .lead_time }}
+        <div class="card p-5">
+          <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-navy-50 text-navy-700">{{ partial "icon.html" "clock" }}</span>
+          <p class="mt-3 text-xs font-bold tracking-wider text-ink-soft uppercase">{{ i18n "product.lead_time" }}</p>
+          <p class="mt-1 text-sm font-semibold text-navy-900">{{ . }}</p>
+        </div>
+        {{- end }}
+        {{- with .packaging_details }}
+        <div class="card p-5">
+          <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-navy-50 text-navy-700">{{ partial "icon.html" "package" }}</span>
+          <p class="mt-3 text-xs font-bold tracking-wider text-ink-soft uppercase">{{ i18n "product.packaging" }}</p>
+          <p class="mt-1 text-sm font-semibold text-navy-900">{{ . }}</p>
+        </div>
+        {{- end }}
+        {{- with .payment_terms }}
+        <div class="card p-5">
+          <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-navy-50 text-navy-700">{{ partial "icon.html" "badge-check" }}</span>
+          <p class="mt-3 text-xs font-bold tracking-wider text-ink-soft uppercase">{{ i18n "product.payment" }}</p>
+          <p class="mt-1 text-sm font-semibold text-navy-900">{{ . }}</p>
+        </div>
+        {{- end }}
+      </div>
+    </div>
+    {{- end }}
+  </div>
+</section>
+
+{{- /* Related products */}}
+{{- $related := where (where site.RegularPages "Section" "products") "Params.product_categories" "intersect" $cats }}
+{{- $related = $related | complement (slice .) }}
+{{- with first 4 $related }}
+<section class="bg-mist py-16">
+  <div class="container-x">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <h2 class="section-title">{{ i18n "product.related_products" }}</h2>
+      <a href="{{ "products/" | relURL }}" class="btn btn-outline btn-sm">{{ i18n "home.view_all_products" }}</a>
+    </div>
+    <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {{- range . }}{{ partial "product-card.html" (dict "p" .) }}{{ end }}
+    </div>
+  </div>
+</section>
+{{- end }}
+
+{{- /* Inquiry form */}}
+<section id="inquiry-form" class="scroll-mt-24 bg-navy-900 py-16 md:py-20">
+  <div class="container-x max-w-3xl">
+    <p class="eyebrow eyebrow-light">Inquiry</p>
+    <h2 class="section-title section-title-light mt-4">{{ i18n "contact.form_title" }}</h2>
+    <p class="mt-3 text-sm leading-relaxed text-white/70">{{ i18n "contact.form_sub" }}</p>
+    <div class="mt-8 rounded-2xl bg-white p-6 md:p-8">
+      {{- partial "inquiry-form.html" (dict "prefix" "prod" "preset" (printf "%s (%s)" .Title .Params.model)) }}
+    </div>
+  </div>
+</section>
+
+{{- /* Product structured data */}}
+<script type="application/ld+json">
+{{- $imgsLd := slice }}
+{{- range $imgs }}{{ $imgsLd = $imgsLd | append (.Process "resize 900x webp q85").Permalink }}{{ end }}
+{{- dict
+  "@context" "https://schema.org"
+  "@type" "Product"
+  "name" .Title
+  "sku" .Params.model
+  "description" .Params.short_description
+  "image" $imgsLd
+  "brand" (dict "@type" "Brand" "name" $s.company.short_name)
+  "offers" (dict "@type" "Offer" "availability" "https://schema.org/InStock" "seller" (dict "@type" "Organization" "name" $s.company.name))
+| jsonify (dict "indent" "") | safeJS }}
+</script>
+{{ end }}

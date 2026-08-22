@@ -1,0 +1,10 @@
+{{ define "main" }}
+<section class="py-24">
+  <div class="container-x text-center">
+    <h1 class="section-title">{{ .Title }}</h1>
+    <p class="lead mt-4">
+      <a href="{{ "products/" | relURL }}">{{ i18n "home.view_all_products" }} {{ partial "icon.html" "arrow-right" }}</a>
+    </p>
+  </div>
+</section>
+{{ end }}

@@ -1,0 +1,13 @@
+{{ define "main" }}
+<section class="page-hero">
+  <div class="container-x relative z-10 py-24 text-center md:py-32">
+    <p class="font-display text-7xl font-extrabold tracking-tight text-gold-400 md:text-8xl">404</p>
+    <h1 class="page-hero-title mt-5">{{ i18n "misc.not_found_title" }}</h1>
+    <p class="page-hero-sub mx-auto">{{ i18n "misc.not_found_text" }}</p>
+    <div class="mt-9 flex flex-wrap justify-center gap-4">
+      <a href="{{ "" | relLangURL }}" class="btn btn-gold btn-lg">{{ i18n "misc.go_home" }} {{ partial "icon.html" "arrow-right" }}</a>
+      <a href="{{ "products/" | relURL }}" class="btn btn-outline-light btn-lg">{{ i18n "home.view_all_products" }}</a>
+    </div>
+  </div>
+</section>
+{{ end }}

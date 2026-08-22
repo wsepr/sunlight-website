@@ -1,0 +1,45 @@
+{{- /* Params: dict "prefix" string (unique id prefix) "preset" string (product interest value) */ -}}
+{{- $prefix := .prefix | default "f" -}}
+{{- $preset := .preset | default "" -}}
+<form class="inquiry-form" novalidate>
+  <input type="text" name="company_website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+  <div class="grid gap-4 sm:grid-cols-2">
+    <div>
+      <label class="field-label" for="{{ $prefix }}-name">{{ i18n "form.name" }} *</label>
+      <input class="field-input" id="{{ $prefix }}-name" name="name" type="text" data-label="Name" required autocomplete="name">
+    </div>
+    <div>
+      <label class="field-label" for="{{ $prefix }}-email">{{ i18n "form.email" }} *</label>
+      <input class="field-input" id="{{ $prefix }}-email" name="email" type="email" data-label="Email" required autocomplete="email">
+    </div>
+    <div>
+      <label class="field-label" for="{{ $prefix }}-company">{{ i18n "form.company" }}</label>
+      <input class="field-input" id="{{ $prefix }}-company" name="company" type="text" data-label="Company" autocomplete="organization">
+    </div>
+    <div>
+      <label class="field-label" for="{{ $prefix }}-phone">{{ i18n "form.phone" }}</label>
+      <input class="field-input" id="{{ $prefix }}-phone" name="phone" type="tel" data-label="Phone" autocomplete="tel">
+    </div>
+    <div>
+      <label class="field-label" for="{{ $prefix }}-country">{{ i18n "form.country" }}</label>
+      <input class="field-input" id="{{ $prefix }}-country" name="country" type="text" data-label="Country" autocomplete="country-name">
+    </div>
+    <div>
+      <label class="field-label" for="{{ $prefix }}-interest">{{ i18n "form.product_interest" }}</label>
+      <input class="field-input" id="{{ $prefix }}-interest" name="product_interest" type="text" data-label="Product interest" value="{{ $preset }}">
+    </div>
+    <div class="sm:col-span-2">
+      <label class="field-label" for="{{ $prefix }}-message">{{ i18n "form.message" }} *</label>
+      <textarea class="field-input" id="{{ $prefix }}-message" name="message" rows="5" data-label="Message" required placeholder="{{ i18n "form.message_ph" }}"></textarea>
+    </div>
+  </div>
+  <div class="mt-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <button type="submit" class="btn btn-gold btn-lg">{{ partial "icon.html" "send" }} {{ i18n "form.submit" }}</button>
+    <p class="text-xs text-ink-soft">{{ i18n "form.success_text" }}</p>
+  </div>
+</form>
+<div class="form-success hidden rounded-2xl bg-mist p-8 text-center">
+  <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gold-500 text-navy-950">{{ partial "icon.html" "check" }}</span>
+  <p class="mt-4 font-display text-lg font-bold text-navy-900">{{ i18n "form.success_title" }}</p>
+  <p class="mt-1 text-sm text-ink-soft">{{ i18n "form.success_text" }}</p>
+</div>

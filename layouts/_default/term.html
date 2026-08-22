@@ -1,0 +1,46 @@
+{{ define "main" }}
+{{- $s := hugo.Data.settings -}}
+{{- $products := .Pages -}}
+{{- $cover := "" -}}
+{{- with .Resources.GetMatch (.Params.cover | default "") }}{{ $cover = .RelPermalink }}{{ end -}}
+
+<section class="page-hero">
+  {{- with .Resources.GetMatch (.Params.cover | default "") }}
+    <img class="absolute inset-0 h-full w-full object-cover opacity-25" src="{{ (.Process "resize 1600x webp q70").RelPermalink }}" alt="" aria-hidden="true" loading="eager" decoding="async">
+  {{- end }}
+  <div class="container-x relative z-10">
+    {{ partial "breadcrumb.html" (dict "page" . "light" true) }}
+    <p class="eyebrow eyebrow-light mt-5">{{ i18n "product.category_label" }}</p>
+    <h1 class="page-hero-title mt-3">{{ .Title }}</h1>
+    <p class="page-hero-sub">{{ .Params.description }}</p>
+    <p class="mt-5 text-sm font-bold tracking-wider text-gold-400 uppercase">{{ len $products }} {{ i18n "product.products_count" }}</p>
+  </div>
+</section>
+
+<section class="py-12 md:py-16">
+  <div class="container-x">
+    <div class="flex justify-between gap-4">
+      <a href="{{ "products/" | relURL }}" class="chip">
+        {{ i18n "product.all_categories" }}
+      </a>
+      <a href="{{ "contact/" | relURL }}#inquiry-form" class="btn btn-navy btn-sm">{{ i18n "nav.get_quote" }}</a>
+    </div>
+    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {{- range $products }}{{ partial "product-card.html" (dict "p" .) }}{{ end }}
+    </div>
+    {{- with .Content }}
+    <div class="rich mx-auto mt-16 max-w-3xl">{{ . }}</div>
+    {{- end }}
+  </div>
+</section>
+
+{{- with $s.cta }}
+<section class="cta-band">
+  <div class="container-x relative z-10 py-16 text-center md:py-20">
+    <h2 class="section-title section-title-light mx-auto max-w-2xl">{{ .title }}</h2>
+    <p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-white/70 md:text-base">{{ .text }}</p>
+    <a href="{{ "contact/" | relURL }}#inquiry-form" class="btn btn-gold btn-lg mt-8">{{ .button }} {{ partial "icon.html" "arrow-right" }}</a>
+  </div>
+</section>
+{{- end }}
+{{ end }}

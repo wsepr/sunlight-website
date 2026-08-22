@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Locale }}">
+<head>
+  {{ partial "head.html" . }}
+</head>
+<body
+  class="{{ if .IsHome }}on-hero{{ end }}"
+  data-endpoint="{{ hugo.Data.settings.form_endpoint }}"
+  data-email="{{ hugo.Data.settings.contact.email }}"
+  data-site="{{ hugo.Data.settings.company.short_name }}"
+>
+  <a href="#main" class="skip-link">Skip to content</a>
+  {{ partial "header.html" . }}
+  <main id="main" tabindex="-1">
+    {{ block "main" . }}{{ end }}
+  </main>
+  {{ partial "footer.html" . }}
+  {{ partial "floating.html" . }}
+  {{ with $js := resources.Get "js/main.js" | minify | fingerprint }}
+    <script src="{{ $js.RelPermalink }}" defer></script>
+  {{ end }}
+</body>
+</html>

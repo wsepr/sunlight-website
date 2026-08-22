@@ -1,0 +1,209 @@
+{{ define "main" }}
+{{- $s := hugo.Data.settings -}}
+{{- $all := where site.RegularPages "Section" "products" -}}
+{{- $featured := where $all "Params.featured" true -}}
+{{- $want := .Params.featured_count | default 6 -}}
+{{- if lt (len $featured) $want -}}
+  {{- $featured = $featured | append (first (sub $want (len $featured)) (complement $featured $all)) -}}
+{{- end -}}
+{{- $certPage := site.GetPage "/certifications" -}}
+
+{{- /* ---------- Hero ---------- */}}
+<section class="hero">
+  {{- with .Resources.GetMatch (.Params.hero_image | default "hero.jpg") }}
+    <img class="hero-bg" src="{{ (.Process "resize 1920x webp q80").RelPermalink }}" srcset="{{ (.Process "resize 960x webp q78").RelPermalink }} 960w, {{ (.Process "resize 1600x webp q80").RelPermalink }} 1600w, {{ (.Process "resize 2200x webp q78").RelPermalink }} 2200w" sizes="100vw" width="{{ .Width }}" height="{{ .Height }}" alt="{{ $.Params.hero_alt | default (printf "%s — %s" $s.company.name $s.company.tagline) }}" fetchpriority="high" decoding="sync">
+  {{- end }}
+  <div class="hero-scrim" aria-hidden="true"></div>
+  <div class="container-x relative z-10">
+    <div class="hero-enter max-w-3xl">
+      <p class="eyebrow eyebrow-light">{{ .Params.hero_eyebrow }}</p>
+      <h1 class="hero-title mt-5">{{ .Params.hero_title_prefix }} <em>{{ .Params.hero_title_highlight }}</em></h1>
+      <p class="hero-sub">{{ .Params.hero_subtitle }}</p>
+      <div class="mt-9 flex flex-wrap gap-4">
+        <a href="{{ "products/" | relURL }}" class="btn btn-gold btn-lg">{{ i18n "hero.view_products" }} {{ partial "icon.html" "arrow-right" }}</a>
+        <a href="{{ "contact/" | relURL }}" class="btn btn-outline-light btn-lg">{{ i18n "hero.contact_us" }}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{- /* ---------- Stats ---------- */}}
+<section class="container-x relative z-10 -mt-14" aria-label="Company statistics">
+  <div class="stats-glass reveal">
+    {{- range $s.stats }}
+    <div class="stat-cell">
+      <p class="stat-value">
+        <span class="counter" data-count="{{ .value }}">0</span>{{ with .suffix }}<span class="stat-suffix">{{ . }}</span>{{ end }}
+      </p>
+      <p class="stat-label">{{ .label }}</p>
+    </div>
+    {{- end }}
+  </div>
+</section>
+
+{{- /* ---------- Advantages ---------- */}}
+<section class="py-20 md:py-28">
+  <div class="container-x">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="eyebrow eyebrow-dark justify-center">{{ .Params.advantages_eyebrow | default "Our Strengths" }}</p>
+      <h2 class="section-title mt-4">{{ i18n "home.advantages_title" }}</h2>
+      <p class="lead mt-4">{{ i18n "home.advantages_sub" }}</p>
+    </div>
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {{- range $i, $a := .Params.advantages }}
+      <div class="adv-card group reveal" data-delay="{{ mul $i 80 }}">
+        <div class="adv-icon">{{ partial "icon.html" $a.icon }}</div>
+        <h3 class="font-display text-lg font-bold text-navy-900">{{ $a.title }}</h3>
+        <p class="mt-2 text-sm leading-relaxed text-ink-soft">{{ $a.text }}</p>
+      </div>
+      {{- end }}
+    </div>
+  </div>
+</section>
+
+{{- /* ---------- Categories ---------- */}}
+<section class="bg-mist py-20 md:py-28">
+  <div class="container-x">
+    <div class="flex flex-wrap items-end justify-between gap-6 reveal">
+      <div class="max-w-2xl">
+        <p class="eyebrow eyebrow-dark">Product Lines</p>
+        <h2 class="section-title mt-4">{{ i18n "home.categories_title" }}</h2>
+        <p class="lead mt-4">{{ i18n "home.categories_sub" }}</p>
+      </div>
+    </div>
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {{- range $i, $e := site.Taxonomies.product_categories.Alphabetical }}
+        {{- $slug := $e.Name | urlize }}
+        {{- with site.GetPage (printf "/product_categories/%s" $slug) }}
+        <a href="{{ .RelPermalink }}" class="cat-card group reveal" data-delay="{{ mul $i 80 }}">
+          {{- partial "img.html" (dict "page" . "name" .Params.cover "alt" .Title "sizes" "(max-width: 768px) 100vw, 25vw") }}
+          <span class="cat-card-overlay" aria-hidden="true"></span>
+          <span class="absolute inset-x-0 bottom-0 p-5">
+            <span class="font-display text-lg font-extrabold text-white">{{ .Title }}</span>
+            <span class="mt-1 flex items-center justify-between text-xs font-semibold tracking-wider text-white/70 uppercase">
+              <span>{{ $e.Count }} {{ i18n "product.products_count" }}</span>
+              {{ partial "icon.html" "arrow-right" }}
+            </span>
+          </span>
+        </a>
+        {{- end }}
+      {{- end }}
+    </div>
+  </div>
+</section>
+
+{{- /* ---------- Featured products ---------- */}}
+<section class="py-20 md:py-28">
+  <div class="container-x">
+    <div class="flex flex-wrap items-end justify-between gap-6 reveal">
+      <div class="max-w-2xl">
+        <p class="eyebrow eyebrow-dark">Hot Sellers</p>
+        <h2 class="section-title mt-4">{{ i18n "home.hot_products_title" }}</h2>
+        <p class="lead mt-4">{{ i18n "home.hot_products_sub" }}</p>
+      </div>
+      <a href="{{ "products/" | relURL }}" class="btn btn-outline">{{ i18n "home.view_all_products" }} {{ partial "icon.html" "arrow-right" }}</a>
+    </div>
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {{- range $featured }}{{ partial "product-card.html" (dict "p" .) }}{{ end }}
+    </div>
+  </div>
+</section>
+
+{{- /* ---------- About teaser ---------- */}}
+<section class="bg-mist py-20 md:py-28">
+  <div class="container-x grid items-center gap-12 lg:grid-cols-2">
+    <div class="reveal relative">
+      <div class="overflow-hidden rounded-2xl shadow-lift">
+        {{- partial "img.html" (dict "page" . "name" .Params.teaser_image "alt" (printf "Inside the %s factory" $s.company.short_name) "sizes" "(max-width: 1024px) 100vw, 50vw" "widths" (slice 600 1000)) }}
+      </div>
+      <div class="absolute -right-3 -bottom-3 hidden rounded-2xl bg-navy-900 px-6 py-5 text-white shadow-pop md:block">
+        <p class="font-display text-3xl font-extrabold text-gold-400">{{ sub (now.Year) $s.company.established }}+</p>
+        <p class="text-xs font-semibold tracking-wider text-white/70 uppercase">Years of Export</p>
+      </div>
+    </div>
+    <div class="reveal">
+      <p class="eyebrow eyebrow-dark">{{ i18n "about.our_story" }}</p>
+      <h2 class="section-title mt-4">{{ .Params.teaser_title }}</h2>
+      <p class="lead mt-5">{{ .Params.teaser_text }}</p>
+      <ul class="mt-6 space-y-3">
+        {{- range .Params.teaser_points }}
+        <li class="flex items-start gap-3 text-sm font-semibold text-navy-900">
+          <span class="mt-0.5 text-gold-600">{{ partial "icon.html" "check" }}</span>{{ . }}
+        </li>
+        {{- end }}
+      </ul>
+      <a href="{{ "about/" | relURL }}" class="btn btn-navy btn-lg mt-8">{{ i18n "home.about_teaser_cta" }} {{ partial "icon.html" "arrow-right" }}</a>
+    </div>
+  </div>
+</section>
+
+{{- /* ---------- Certifications teaser ---------- */}}
+<section class="py-20 md:py-28">
+  <div class="container-x">
+    <div class="flex flex-wrap items-end justify-between gap-6 reveal">
+      <div class="max-w-2xl">
+        <p class="eyebrow eyebrow-dark">Quality & Compliance</p>
+        <h2 class="section-title mt-4">{{ i18n "home.certs_teaser_title" }}</h2>
+        <p class="lead mt-4">{{ i18n "home.certs_teaser_sub" }}</p>
+      </div>
+      <a href="{{ "certifications/" | relURL }}" class="btn btn-outline">{{ i18n "cert.view_all" }} {{ partial "icon.html" "arrow-right" }}</a>
+    </div>
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {{- range first 4 ($certPage.Params.certificates | default slice) }}
+      <a href="{{ "certifications/" | relURL }}" class="cert-card group reveal">
+        <div class="cert-body">
+          {{- if .image }}
+            {{- with $certPage.Resources.GetMatch .image }}
+              <img src="{{ .RelPermalink }}" alt="{{ $.title }}" loading="lazy" decoding="async">
+            {{- end }}
+          {{- else }}
+            <div class="cert-placeholder-frame">
+              <span class="cert-seal">{{ partial "icon.html" "award" }}</span>
+              <span class="font-display text-sm font-extrabold tracking-wide text-white uppercase">{{ .title }}</span>
+            </div>
+          {{- end }}
+        </div>
+        <div class="p-5">
+          <h3 class="font-display text-sm font-bold text-navy-900">{{ .title }}</h3>
+          <p class="mt-1 text-xs text-ink-soft">{{ .issuer }}</p>
+        </div>
+      </a>
+      {{- end }}
+    </div>
+  </div>
+</section>
+
+{{- /* ---------- Testimonials ---------- */}}
+<section class="bg-mist py-20 md:py-28">
+  <div class="container-x">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="eyebrow eyebrow-dark justify-center">Testimonials</p>
+      <h2 class="section-title mt-4">{{ i18n "home.testimonials_title" }}</h2>
+      <p class="lead mt-4">{{ i18n "home.testimonials_sub" }}</p>
+    </div>
+    <div class="mt-12 grid gap-6 md:grid-cols-3">
+      {{- range $i, $t := .Params.testimonials }}
+      <figure class="quote-card reveal" data-delay="{{ mul $i 80 }}">
+        <div class="flex gap-0.5 text-gold-500" aria-label="5 out of 5 stars">
+          {{- range 5 }}{{ partial "icon.html" "star" }}{{ end }}
+        </div>
+        <blockquote class="mt-4 flex-1 text-sm leading-relaxed text-ink-soft">“{{ .quote }}”</blockquote>
+        <figcaption class="mt-5 border-t border-line pt-4">
+          <p class="font-display text-sm font-bold text-navy-900">{{ .name }}</p>
+          <p class="text-xs text-ink-soft">{{ .role }} · {{ .country }}</p>
+        </figcaption>
+      </figure>
+      {{- end }}
+    </div>
+  </div>
+</section>
+
+{{- /* ---------- CTA band ---------- */}}
+<section class="cta-band">
+  <div class="container-x relative z-10 py-20 text-center md:py-24">
+    <h2 class="section-title section-title-light mx-auto max-w-2xl reveal">{{ $s.cta.title }}</h2>
+    <p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-white/70 md:text-base reveal">{{ $s.cta.text }}</p>
+    <a href="{{ "contact/" | relURL }}#inquiry-form" class="btn btn-gold btn-lg mt-8 reveal">{{ $s.cta.button }} {{ partial "icon.html" "arrow-right" }}</a>
+  </div>
+</section>
+{{ end }}

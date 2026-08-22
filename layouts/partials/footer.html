@@ -1,0 +1,87 @@
+{{- $s := hugo.Data.settings -}}
+{{- $wa := printf "https://wa.me/%s?text=%s" (replace $s.contact.whatsapp "+" "") (printf "Hello %s, I'd like to make an inquiry." $s.company.short_name | urlquery) -}}
+<footer class="site-footer">
+  <div class="container-x grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+    <div>
+      <div class="flex items-center gap-2.5">
+        <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="14" fill="#ffffff" fill-opacity="0.08"/>
+          <circle cx="32" cy="25" r="9" fill="#C9A227"/>
+          <path d="M14 41c4-3 8-3 12 0s8 3 12 0 8-3 12 0" stroke="#F7F8FA" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M16 50c3.5-2.5 7-2.5 10.5 0s7 2.5 10.5 0 7-2.5 10.5 0" stroke="#C9A227" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span class="font-display text-lg font-extrabold tracking-tight text-white">{{ $s.company.short_name | upper }}</span>
+      </div>
+      <p class="mt-4 text-sm leading-relaxed text-white/60">{{ $s.company.description }}</p>
+      <div class="mt-5 flex flex-wrap gap-2">
+        {{- range $key, $url := $s.socials }}
+          {{- with $url }}
+            <a href="{{ . }}" class="social-btn" target="_blank" rel="noopener noreferrer" aria-label="{{ $key }}" title="{{ $key | title }}">
+              {{ partial "icon.html" $key }}
+            </a>
+          {{- end }}
+        {{- end }}
+        <a href="{{ $wa }}" class="social-btn" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp">
+          {{ partial "icon.html" "whatsapp" }}
+        </a>
+      </div>
+    </div>
+
+    <nav aria-label="{{ i18n "footer.sitemap" }}">
+      <h3 class="font-display text-sm font-bold tracking-[0.18em] text-white uppercase">{{ i18n "footer.sitemap" }}</h3>
+      <ul class="mt-4 space-y-2.5">
+        {{- range site.Menus.main }}
+          <li><a class="footer-link" href="{{ .URL }}">{{ .Name }}</a></li>
+        {{- end }}
+      </ul>
+    </nav>
+
+    <nav aria-label="{{ i18n "footer.product_categories" }}">
+      <h3 class="font-display text-sm font-bold tracking-[0.18em] text-white uppercase">{{ i18n "footer.product_categories" }}</h3>
+      <ul class="mt-4 space-y-2.5">
+        {{- range site.Taxonomies.product_categories.Alphabetical }}
+          {{- $slug := .Name | urlize }}
+          {{- with site.GetPage (printf "/product_categories/%s" $slug) }}
+            <li><a class="footer-link" href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+          {{- end }}
+        {{- end }}
+      </ul>
+    </nav>
+
+    <div>
+      <h3 class="font-display text-sm font-bold tracking-[0.18em] text-white uppercase">{{ i18n "footer.contact_us_col" }}</h3>
+      <ul class="mt-4 space-y-3 text-sm text-white/60">
+        <li class="flex gap-2.5">
+          {{ partial "icon.html" "map-pin" }}
+          <span>{{ $s.contact.address }}</span>
+        </li>
+        <li>
+          <a href="tel:{{ replace $s.contact.phone " " "" }}" class="flex gap-2.5 transition-colors hover:text-gold-400">
+            {{ partial "icon.html" "phone" }}<span>{{ $s.contact.phone }}</span>
+          </a>
+        </li>
+        <li>
+          <a href="mailto:{{ $s.contact.email }}" class="flex gap-2.5 transition-colors hover:text-gold-400">
+            {{ partial "icon.html" "mail" }}<span>{{ $s.contact.email }}</span>
+          </a>
+        </li>
+        <li>
+          <a href="{{ $wa }}" target="_blank" rel="noopener noreferrer" class="flex gap-2.5 transition-colors hover:text-gold-400">
+            {{ partial "icon.html" "whatsapp" }}<span>{{ $s.contact.whatsapp }}</span>
+          </a>
+        </li>
+        <li class="flex gap-2.5">
+          {{ partial "icon.html" "clock" }}
+          <span>{{ $s.contact.hours }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-white/10">
+    <div class="container-x flex flex-col items-center justify-between gap-2 py-5 text-xs text-white/45 sm:flex-row">
+      <p>&copy; {{ now.Year }} {{ $s.company.name }}. {{ i18n "footer.all_rights" }}</p>
+      <p>{{ $s.contact.hours }}</p>
+    </div>
+  </div>
+</footer>

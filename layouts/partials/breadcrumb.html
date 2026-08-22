@@ -1,0 +1,38 @@
+{{- /* Params: dict "page" . "light" bool (default true = light text on dark bg) */ -}}
+{{- $p := .page -}}
+{{- $light := .light | default true -}}
+{{- $crumbs := slice (dict "name" (i18n "misc.breadcrumb_home") "url" (relLangURL "/")) -}}
+{{- if eq $p.Kind "term" }}
+  {{- with site.GetPage "/products" }}
+    {{- $crumbs = $crumbs | append (dict "name" .Title "url" .RelPermalink) }}
+  {{- end }}
+{{- else }}
+  {{- range $p.Ancestors.Reverse }}
+    {{- if not .IsHome }}
+      {{- $crumbs = $crumbs | append (dict "name" .Title "url" .RelPermalink) }}
+      {{- if eq .Section "products" }}
+        {{- with index ($p.Params.product_categories | default slice) 0 }}
+          {{- with site.GetPage (printf "/product_categories/%s" (. | urlize)) }}
+            {{- $crumbs = $crumbs | append (dict "name" .Title "url" .RelPermalink) }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- $crumbs = $crumbs | append (dict "name" $p.Title) }}
+<nav class="crumbs {{ if not $light }}crumbs-light{{ end }}" aria-label="Breadcrumb">
+  {{- range $i, $c := $crumbs }}
+    {{- if $i }}{{ partial "icon.html" "chevron-right" }}{{ end }}
+    {{- if .url }}<a href="{{ .url }}">{{ .name }}</a>{{ else }}<span aria-current="page">{{ .name }}</span>{{ end }}
+  {{- end }}
+</nav>
+<script type="application/ld+json">
+{{- $ld := slice }}
+{{- range $i, $c := $crumbs }}
+  {{- $item := dict "@type" "ListItem" "position" (add $i 1) "name" $c.name }}
+  {{- with .url }}{{ $item = merge $item (dict "item" (. | absURL)) }}{{ end }}
+  {{- $ld = $ld | append $item }}
+{{- end }}
+{{- dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" $ld | jsonify (dict "indent" "") | safeJS }}
+</script>

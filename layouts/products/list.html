@@ -1,0 +1,66 @@
+{{ define "main" }}
+{{- $products := where site.RegularPages "Section" "products" -}}
+
+<section class="page-hero">
+  <div class="container-x">
+    {{ partial "breadcrumb.html" (dict "page" . "light" true) }}
+    <h1 class="page-hero-title mt-4">{{ .Title }}</h1>
+    <p class="page-hero-sub">{{ .Params.description }}</p>
+  </div>
+</section>
+
+<section class="py-12 md:py-16">
+  <div class="container-x">
+    {{- /* Toolbar: search + category chips + sort */}}
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div class="relative w-full max-w-md">
+        <span class="absolute top-1/2 left-4 -translate-y-1/2 text-ink-soft/60">{{ partial "icon.html" "search" }}</span>
+        <input type="search" id="productSearch" class="search-input" placeholder="{{ i18n "product.search_placeholder" }}" aria-label="{{ i18n "product.search_placeholder" }}">
+      </div>
+      <div class="flex items-center gap-3">
+        <label for="productSort" class="sr-only">Sort</label>
+        <select id="productSort" class="select-input">
+          <option value="newest">{{ i18n "product.sort_newest" }}</option>
+          <option value="name">{{ i18n "product.sort_name" }}</option>
+        </select>
+        <p class="text-sm font-semibold whitespace-nowrap text-ink-soft">
+          <span id="resultCount">{{ len $products }}</span> {{ i18n "product.results" }}
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-5 flex flex-wrap gap-2" role="group" aria-label="{{ i18n "product.filter_by" }}">
+      <button type="button" class="chip active" data-cat="all" aria-pressed="true">{{ i18n "product.all_categories" }}</button>
+      {{- range site.Taxonomies.product_categories.Alphabetical }}
+        {{- $slug := .Name | urlize }}
+        {{- with site.GetPage (printf "/product_categories/%s" $slug) }}
+        <button type="button" class="chip" data-cat="{{ $slug }}" aria-pressed="false">
+          {{ .Title }} <span class="opacity-60">({{ len .Pages }})</span>
+        </button>
+        {{- end }}
+      {{- end }}
+    </div>
+
+    {{- /* Grid */}}
+    <div id="productGrid" class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {{- range $products }}{{ partial "product-card.html" (dict "p" .) }}{{ end }}
+    </div>
+
+    <div id="noResults" class="hidden py-20 text-center">
+      <p class="font-display text-xl font-bold text-navy-900">{{ i18n "product.no_results" }}</p>
+      <p class="mt-2 text-sm text-ink-soft">{{ i18n "product.no_results_hint" }}</p>
+    </div>
+
+    {{- /* Load more (client-side; search/filter always shows all matches) */}}
+    <div id="loadMoreWrap" class="mt-10 hidden text-center">
+      <button type="button" id="loadMoreBtn" class="btn btn-outline btn-lg">
+        {{ i18n "product.load_more" }} <span id="loadMoreCount" class="font-semibold text-gold-600"></span>
+      </button>
+    </div>
+
+    {{- with .Content }}
+    <div class="rich mx-auto mt-16 max-w-3xl">{{ . }}</div>
+    {{- end }}
+  </div>
+</section>
+{{ end }}

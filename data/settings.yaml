@@ -1,0 +1,46 @@
+# Global site settings — demo data, replace via Sveltia CMS (Site Settings collection)
+company:
+  name: "Sunwave Home Appliances Co., Ltd."
+  short_name: "Sunwave"
+  tagline: "Trusted Home Appliance Manufacturer Since 2010"
+  established: 2010
+  description: "Sunwave is a B2B home-appliance manufacturer based in Ningbo, China. We design, produce and export kitchen appliances, air treatment, personal care and floor care products to 60+ countries with full OEM/ODM support."
+  logo: ""  # optional logo image path, e.g. /images/logo.png — empty = built-in SVG brand mark
+
+contact:
+  address: "Building 18, Xiehe Industrial Park, Yinzhou District, Ningbo, Zhejiang 315100, China"
+  phone: "+86-574-8888-6666"
+  email: "sales@sunwave.example.com"
+  whatsapp: "+8613800000000"
+  hours: "Mon – Sat, 8:30 – 18:00 (GMT+8)"
+  map_query: "Yinzhou District, Ningbo, Zhejiang, China"
+
+socials:
+  facebook: "https://facebook.com/sunwave.demo"
+  linkedin: "https://linkedin.com/company/sunwave-demo"
+  tiktok: "https://tiktok.com/@sunwave.demo"
+  youtube: "https://youtube.com/@sunwave.demo"
+  instagram: "https://instagram.com/sunwave.demo"
+
+stats:
+  - value: 15
+    suffix: "+"
+    label: "Years of Manufacturing"
+  - value: 60
+    suffix: "+"
+    label: "Export Countries"
+  - value: 1200
+    suffix: "+"
+    label: "B2B Clients Served"
+  - value: 12
+    suffix: ""
+    label: "Global Certifications"
+
+cta:
+  title: "Ready to Start Your Sourcing Project?"
+  text: "Send us your requirements — get a detailed quotation and product proposal within 24 hours."
+  button: "Get a Free Quote Today"
+
+# Optional third-party integrations (leave empty to disable)
+chat_url: ""         # e.g. Tawk.to / LiveChat embed script URL
+form_endpoint: ""    # e.g. https://formspree.io/f/xxxxx — empty = inquiry forms use mailto fallback

@@ -1,0 +1,52 @@
+{{- $s := hugo.Data.settings -}}
+<header id="siteHeader" class="site-header">
+  <div class="container-x flex h-16 items-center justify-between gap-3">
+    {{ partial "logo.html" . }}
+
+    <nav class="hidden items-center gap-7 lg:flex" aria-label="{{ i18n "nav.home_title" }}">
+      {{- range site.Menus.main }}
+        {{- $active := or ($.IsMenuCurrent "main" .) (and (ne .URL "/") (hasPrefix $.RelPermalink .URL)) }}
+        <a class="nav-link" href="{{ .URL }}" {{ if $active }}aria-current="page"{{ end }}>{{ .Name }}</a>
+      {{- end }}
+    </nav>
+
+    <div class="flex items-center gap-1.5">
+      <span class="header-lang hidden md:inline-flex" title="More languages coming soon">
+        {{ partial "icon.html" "globe" }}{{ i18n "nav.language" }}
+      </span>
+
+      <button type="button" class="icon-btn open-cart relative" aria-label="{{ i18n "nav.inquiry_cart" }}">
+        {{ partial "icon.html" "bag" }}
+        <span class="cart-count-wrap absolute top-0.5 right-0.5 hidden">
+          <span class="flex h-4 min-w-4 items-center justify-center rounded-full bg-gold-500 px-1 text-[10px] font-bold text-navy-950">
+            <span class="cart-count">0</span>
+          </span>
+        </span>
+      </button>
+
+      <a href="{{ "contact/" | relURL }}#inquiry-form" class="btn btn-gold btn-sm hidden sm:inline-flex">
+        {{ i18n "nav.get_quote" }}
+      </a>
+
+      <button type="button" id="menuBtn" class="icon-btn lg:hidden" aria-expanded="false" aria-controls="mobileMenu" aria-label="{{ i18n "nav.open_menu" }}">
+        <span id="menuIconOpen">{{ partial "icon.html" "menu" }}</span>
+        <span id="menuIconClose" class="hidden">{{ partial "icon.html" "x" }}</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav id="mobileMenu" class="mobile-menu lg:hidden" aria-label="Mobile navigation">
+  {{- range site.Menus.main }}
+    <a class="mobile-link" href="{{ .URL }}">
+      {{ .Name }}
+      {{ partial "icon.html" "chevron-right" }}
+    </a>
+  {{- end }}
+  <div class="flex flex-col gap-3 p-5">
+    <a href="{{ "contact/" | relURL }}#inquiry-form" class="btn btn-gold w-full">{{ i18n "nav.get_quote" }}</a>
+    <button type="button" class="btn btn-outline open-cart w-full">
+      {{ partial "icon.html" "bag" }} {{ i18n "nav.inquiry_cart" }}
+    </button>
+  </div>
+</nav>

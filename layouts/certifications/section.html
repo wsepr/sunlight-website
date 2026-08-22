@@ -1,0 +1,60 @@
+{{ define "main" }}
+{{- $s := hugo.Data.settings -}}
+
+<section class="page-hero">
+  <div class="container-x relative z-10">
+    {{ partial "breadcrumb.html" (dict "page" . "light" true) }}
+    <p class="eyebrow eyebrow-light mt-5">Quality &amp; Compliance</p>
+    <h1 class="page-hero-title mt-3">{{ .Title }}</h1>
+    <p class="page-hero-sub">{{ .Params.description }}</p>
+  </div>
+</section>
+
+<section class="py-16 md:py-20">
+  <div class="container-x">
+    <p class="lead mx-auto max-w-3xl reveal">{{ .Params.intro }}</p>
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {{- range $i, $c := .Params.certificates }}
+      {{- $imgURL := "" }}{{ $pdfURL := "" }}
+      {{- with $c.image }}{{ with $.Resources.GetMatch . }}{{ $imgURL = .RelPermalink }}{{ end }}{{ end }}
+      {{- with $c.pdf }}{{ with $.Resources.GetMatch . }}{{ $pdfURL = .RelPermalink }}{{ end }}{{ end }}
+      <div class="cert-card group reveal" data-delay="{{ mul $i 60 }}">
+        <div class="cert-body">
+          {{- if $imgURL }}
+            <img src="{{ $imgURL }}" alt="{{ $c.title }} certificate" loading="lazy" decoding="async">
+          {{- else }}
+            <div class="cert-placeholder-frame">
+              <span class="cert-seal">{{ partial "icon.html" "award" }}</span>
+              <span class="font-display text-sm font-extrabold tracking-wide text-white uppercase">{{ $c.title }}</span>
+            </div>
+          {{- end }}
+        </div>
+        <div class="flex flex-1 flex-col p-5">
+          <h2 class="font-display text-sm font-bold text-navy-900">{{ $c.title }}</h2>
+          <p class="mt-1 text-xs font-semibold text-ink-soft">{{ i18n "cert.issued_by" }}: {{ $c.issuer }}</p>
+          {{- with $c.description }}
+          <p class="mt-2 text-xs leading-relaxed text-ink-soft">{{ . }}</p>
+          {{- end }}
+          <p class="mt-3 text-[11px] font-bold tracking-wider text-gold-600 uppercase">
+            {{- with $c.expiry_date }}{{ i18n "cert.valid_until" }}: {{ time.Format "Jan 2006" . }}{{ else }}{{ i18n "cert.no_expiry" }}{{ end }}
+          </p>
+          {{- if $pdfURL }}
+          <a href="{{ $pdfURL }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm mt-4 self-start">{{ partial "icon.html" "download" }} PDF</a>
+          {{- end }}
+        </div>
+      </div>
+      {{- end }}
+    </div>
+  </div>
+</section>
+
+{{- with $s.cta }}
+<section class="cta-band">
+  <div class="container-x relative z-10 py-16 text-center md:py-20">
+    <h2 class="section-title section-title-light mx-auto max-w-2xl reveal">{{ .title }}</h2>
+    <p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-white/70 md:text-base reveal">{{ .text }}</p>
+    <a href="{{ "contact/" | relURL }}#inquiry-form" class="btn btn-gold btn-lg mt-8 reveal">{{ .button }} {{ partial "icon.html" "arrow-right" }}</a>
+  </div>
+</section>
+{{- end }}
+{{ end }}

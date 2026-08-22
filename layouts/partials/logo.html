@@ -1,0 +1,17 @@
+{{- $s := hugo.Data.settings -}}
+<a href="{{ site.BaseURL | relLangURL }}" class="flex items-center gap-2.5" aria-label="{{ $s.company.name }} — {{ i18n "nav.home_title" }}">
+  {{- with $s.company.logo }}
+    <img src="{{ . | relURL }}" alt="{{ $s.company.name }}" class="h-10 w-auto">
+  {{- else }}
+    <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true" class="shrink-0">
+      <rect width="64" height="64" rx="14" fill="#0F2B46"/>
+      <circle cx="32" cy="25" r="9" fill="#C9A227"/>
+      <path d="M14 41c4-3 8-3 12 0s8 3 12 0 8-3 12 0" stroke="#F7F8FA" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M16 50c3.5-2.5 7-2.5 10.5 0s7 2.5 10.5 0 7-2.5 10.5 0" stroke="#C9A227" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    </svg>
+    <span class="flex flex-col leading-none">
+      <span class="brand-name font-display text-lg font-extrabold tracking-tight text-navy-900">{{ $s.company.short_name | upper }}</span>
+      <span class="brand-sub mt-0.5 text-[8.5px] font-bold tracking-[0.32em] text-ink-soft uppercase">Home Appliances</span>
+    </span>
+  {{- end }}
+</a>

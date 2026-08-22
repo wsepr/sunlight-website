@@ -1,7 +1,63 @@
-baseURL: https://example.org/
-locale: en-us
-title: My New Hugo Project
-theme: hugo-blog-awesome
+# Site configuration — Sunwave Home Appliances (demo data, managed via Sveltia CMS)
+baseURL: https://sunwave.example.com/
+locale: en-US
+defaultContentLanguage: en
+title: Sunwave Home Appliances Co., Ltd.
+
+enableRobotsTXT: true
+pluralizeListTitles: false
+
+# i18n-ready: add more language blocks here later (e.g. de, es, zh)
+languages:
+  en:
+    label: English
+    weight: 1
+
+# Product categories are managed as taxonomy terms.
+# Term pages get a pretty URL: /products/<category>/
+taxonomies:
+  product_category: product_categories
+
+permalinks:
+  term:
+    product_categories: /products/:slug/
+
+menus:
+  main:
+    - name: Home
+      url: /
+      weight: 1
+    - name: About Us
+      url: /about/
+      weight: 2
+    - name: Products
+      url: /products/
+      weight: 3
+    - name: Certifications
+      url: /certifications/
+      weight: 4
+    - name: Contact Us
+      url: /contact/
+      weight: 5
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+
+# Hugo 0.161+ runs Node tools (postcss) under the Node.js permission model,
+# which blocks native addons by default. Tailwind v4's lightningcss and
+# @tailwindcss/oxide are native .node modules, so postcss needs addon access.
+security:
+  node:
+    permissions:
+      allowAddons:
+        - postcss
+
+imaging:
+  quality: 82
+  resampleFilter: Lanczos
+
 caches:
   images:
     dir: :cacheDir/images

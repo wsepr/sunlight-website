@@ -1,0 +1,141 @@
+{{ define "main" }}
+{{- $s := hugo.Data.settings -}}
+
+<section class="page-hero">
+  <div class="container-x relative z-10">
+    {{ partial "breadcrumb.html" (dict "page" . "light" true) }}
+    <p class="eyebrow eyebrow-light mt-5">{{ .Params.intro_eyebrow | default (i18n "about.our_story") }}</p>
+    <h1 class="page-hero-title mt-3">{{ .Title }}</h1>
+    <p class="page-hero-sub">{{ .Params.description }}</p>
+  </div>
+</section>
+
+{{- /* Story */}}
+<section class="py-16 md:py-24">
+  <div class="container-x grid items-center gap-12 lg:grid-cols-2">
+    <div class="reveal relative">
+      <div class="overflow-hidden rounded-2xl shadow-lift">
+        {{ partial "img.html" (dict "page" . "name" .Params.intro_image "alt" (printf "Inside the %s factory" $s.company.short_name) "sizes" "(max-width: 1024px) 100vw, 50vw" "widths" (slice 600 1000)) }}
+      </div>
+      <div class="absolute -right-3 -bottom-3 hidden rounded-2xl bg-navy-900 px-6 py-5 text-white shadow-pop md:block">
+        <p class="font-display text-3xl font-extrabold text-gold-400">{{ sub (now.Year) $s.company.established }}+</p>
+        <p class="text-xs font-semibold tracking-wider text-white/70 uppercase">Years of Experience</p>
+      </div>
+    </div>
+    <div class="reveal">
+      <p class="eyebrow eyebrow-dark">{{ .Params.intro_eyebrow | default (i18n "about.our_story") }}</p>
+      <h2 class="section-title mt-4">{{ .Params.intro_title }}</h2>
+      <p class="lead mt-5">{{ .Params.intro_text }}</p>
+      {{- with .Content }}
+      <div class="rich mt-6">{{ . }}</div>
+      {{- end }}
+    </div>
+  </div>
+</section>
+
+{{- /* Stats */}}
+<section class="bg-navy-900 py-14">
+  <div class="container-x">
+    <div class="stats-glass reveal">
+      {{- range $s.stats }}
+      <div class="stat-cell">
+        <p class="stat-value">
+          <span class="counter" data-count="{{ .value }}">0</span>{{ with .suffix }}<span class="stat-suffix">{{ . }}</span>{{ end }}
+        </p>
+        <p class="stat-label">{{ .label }}</p>
+      </div>
+      {{- end }}
+    </div>
+  </div>
+</section>
+
+{{- /* Milestones */}}
+{{- with .Params.milestones }}
+<section class="bg-mist py-16 md:py-24">
+  <div class="container-x">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="eyebrow eyebrow-dark justify-center">Milestones</p>
+      <h2 class="section-title mt-4">{{ i18n "about.milestones_title" }}</h2>
+      <p class="lead mt-4">{{ i18n "about.milestones_sub" }}</p>
+    </div>
+    <div class="timeline mx-auto mt-14 max-w-3xl">
+      {{- range . }}
+      <div class="tl-item reveal">
+        <span class="tl-dot" aria-hidden="true"></span>
+        <p class="tl-year">{{ .year }}</p>
+        <h3 class="font-display mt-1 text-lg font-bold text-navy-900">{{ .title }}</h3>
+        <p class="mt-1.5 text-sm leading-relaxed text-ink-soft">{{ .text }}</p>
+      </div>
+      {{- end }}
+    </div>
+  </div>
+</section>
+{{- end }}
+
+{{- /* Culture */}}
+{{- with .Params.culture }}
+<section class="py-16 md:py-24">
+  <div class="container-x">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="eyebrow eyebrow-dark justify-center">Our Culture</p>
+      <h2 class="section-title mt-4">{{ i18n "about.culture_title" }}</h2>
+    </div>
+    <div class="mt-12 grid gap-6 md:grid-cols-3">
+      {{- range . }}
+      <div class="adv-card group reveal">
+        <div class="adv-icon">{{ partial "icon.html" .icon }}</div>
+        <h3 class="font-display text-lg font-bold text-navy-900">{{ .title }}</h3>
+        <p class="mt-2 text-sm leading-relaxed text-ink-soft">{{ .text }}</p>
+      </div>
+      {{- end }}
+    </div>
+  </div>
+</section>
+{{- end }}
+
+{{- /* Gallery */}}
+{{- with .Params.gallery }}
+<section class="bg-mist py-16 md:py-24">
+  <div class="container-x">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="eyebrow eyebrow-dark justify-center">Factory Tour</p>
+      <h2 class="section-title mt-4">{{ i18n "about.gallery_title" }}</h2>
+    </div>
+    <div class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {{- range $i, $name := . }}
+      <div class="reveal overflow-hidden rounded-2xl shadow-card" data-delay="{{ mul $i 80 }}">
+        {{ partial "img.html" (dict "page" $ "name" $name "alt" (printf "%s — factory photo %d" $s.company.short_name (add $i 1)) "sizes" "(max-width: 768px) 100vw, 33vw" "widths" (slice 400 800)) }}
+      </div>
+      {{- end }}
+    </div>
+  </div>
+</section>
+{{- end }}
+
+{{- /* Partners */}}
+{{- with .Params.partners }}
+<section class="py-16 md:py-24">
+  <div class="container-x">
+    <div class="mx-auto max-w-2xl text-center reveal">
+      <p class="eyebrow eyebrow-dark justify-center">Partners</p>
+      <h2 class="section-title mt-4">{{ i18n "about.partners_title" }}</h2>
+    </div>
+    <div class="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      {{- range . }}
+      <div class="partner-pill reveal">{{ . }}</div>
+      {{- end }}
+    </div>
+  </div>
+</section>
+{{- end }}
+
+{{- with $s.cta }}
+<section class="cta-band">
+  <div class="container-x relative z-10 py-16 text-center md:py-20">
+    <h2 class="section-title section-title-light mx-auto max-w-2xl reveal">{{ .title }}</h2>
+    <p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-white/70 md:text-base reveal">{{ .text }}</p>
+    <a href="{{ "contact/" | relURL }}#inquiry-form" class="btn btn-gold btn-lg mt-8 reveal">{{ .button }} {{ partial "icon.html" "arrow-right" }}</a>
+  </div>
+</section>
+{{- end }}
+{{ end }}

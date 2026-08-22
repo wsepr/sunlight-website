@@ -1,18 +1,328 @@
 # yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
 
+# Sveltia CMS configuration for the Sunwave foreign-trade website.
+# Docs: https://github.com/sveltia/sveltia-cms  (Decap CMS compatible)
+
 backend:
   name: github
   repo: wsepr/sunlight-website
+  branch: master
 
-media_folder: /public/media
-public_folder: /media
+site_url: https://sunwave.example.com
+logo_url: https://sunwave.example.com/favicon.svg
+locale: en
+
+# Global media library — used by collections that upload to shared assets
+# (e.g. the company logo). Page-bundle collections below override this with
+# entry-relative media folders, so product photos are stored next to their pages.
+media_folder: static/images
+public_folder: /images
 
 collections:
-  - name: posts
-    label: Posts
-    label_singular: Post
-    folder: /content/posts
+  # ============================================================
+  # Site Settings — company profile, contact, socials, stats, CTA
+  # ============================================================
+  - name: site_settings
+    label: Site Settings
+    label_singular: Site Settings
+    description: Company profile, contact details, social links and global numbers.
+    files:
+      - name: settings
+        label: Company, Contact & Global Content
+        file: data/settings.yaml
+        format: yaml
+        fields:
+          - label: Company
+            name: company
+            widget: object
+            fields:
+              - { label: "Company Name", name: name, widget: string }
+              - { label: "Short Name (logo & page titles)", name: short_name, widget: string }
+              - { label: "Tagline", name: tagline, widget: string }
+              - { label: "Established Year", name: established, widget: number, min: 1900, max: 2100, value_type: int, default: 2010 }
+              - { label: "Company Description (SEO & footer)", name: description, widget: text }
+              - { label: "Logo Image (optional)", name: logo, widget: image, required: false, hint: "Uploaded to static/images. Leave empty to use the built-in brand mark." }
+          - label: Contact
+            name: contact
+            widget: object
+            fields:
+              - { label: "Address", name: address, widget: text }
+              - { label: "Phone", name: phone, widget: string }
+              - { label: "Email", name: email, widget: string }
+              - { label: "WhatsApp Number", name: whatsapp, widget: string, hint: "Include the country code, e.g. +8613800000000" }
+              - { label: "Working Hours", name: hours, widget: string }
+              - { label: "Google Maps Location", name: map_query, widget: string, hint: "Address or coordinates shown in the Contact page map" }
+          - label: Social Links
+            name: socials
+            widget: object
+            fields:
+              - { label: "Facebook", name: facebook, widget: string, required: false }
+              - { label: "LinkedIn", name: linkedin, widget: string, required: false }
+              - { label: "TikTok", name: tiktok, widget: string, required: false }
+              - { label: "YouTube", name: youtube, widget: string, required: false }
+              - { label: "Instagram", name: instagram, widget: string, required: false }
+          - label: "Statistics (home & about counters)"
+            name: stats
+            widget: list
+            fields:
+              - { label: "Value", name: value, widget: number, value_type: int, default: 10 }
+              - { label: "Suffix", name: suffix, widget: string, required: false, default: "+" }
+              - { label: "Label", name: label, widget: string }
+          - label: "Call-to-Action Band (bottom of pages)"
+            name: cta
+            widget: object
+            fields:
+              - { label: "Title", name: title, widget: string }
+              - { label: "Text", name: text, widget: text }
+              - { label: "Button Label", name: button, widget: string }
+          - { label: "Chat Widget Script URL (optional)", name: chat_url, widget: string, required: false, hint: "e.g. Tawk.to embed URL. Leave empty to disable the chat placeholder." }
+          - { label: "Form Endpoint URL (optional)", name: form_endpoint, widget: string, required: false, hint: "e.g. https://formspree.io/f/xxxxx. Leave empty to use the mailto fallback." }
+
+  # ============================================================
+  # Home Page
+  # ============================================================
+  - name: home
+    label: Home Page
+    description: Hero, advantage cards, company teaser and testimonials.
+    files:
+      - name: home
+        label: Home Content
+        file: content/_index.md
+        media_folder: ""
+        public_folder: ""
+        fields:
+          - { label: "Page Title", name: title, widget: string }
+          - { label: "SEO Description", name: description, widget: text }
+          - { label: "Hero — Eyebrow (small label above title)", name: hero_eyebrow, widget: string }
+          - { label: "Hero — Title (main part)", name: hero_title_prefix, widget: string }
+          - { label: "Hero — Title (gold highlight)", name: hero_title_highlight, widget: string }
+          - { label: "Hero — Subtitle", name: hero_subtitle, widget: text }
+          - { label: "Hero — Background Image", name: hero_image, widget: image }
+          - { label: "Hero — Image Alt Text", name: hero_alt, widget: string, required: false }
+          - { label: "Featured Products Count", name: featured_count, widget: number, min: 3, max: 12, value_type: int, default: 6 }
+          - { label: "Advantages Section Eyebrow", name: advantages_eyebrow, widget: string, required: false, default: "Our Strengths" }
+          - label: "Advantage Cards"
+            name: advantages
+            widget: list
+            fields:
+              - label: "Icon"
+                name: icon
+                widget: select
+                options: [factory, shield-check, badge-check, settings, truck, users, headset, package, globe, sparkles, target, eye, leaf, handshake, ruler, award, sun, clock]
+              - { label: "Title", name: title, widget: string }
+              - { label: "Text", name: text, widget: text }
+          - { label: "Teaser — Image (factory photo)", name: teaser_image, widget: image }
+          - { label: "Teaser — Title", name: teaser_title, widget: string }
+          - { label: "Teaser — Text", name: teaser_text, widget: text }
+          - label: "Teaser — Bullet Points"
+            name: teaser_points
+            widget: list
+            field: { label: "Point", name: point, widget: string }
+          - label: Testimonials
+            name: testimonials
+            widget: list
+            required: false
+            fields:
+              - { label: "Quote", name: quote, widget: text }
+              - { label: "Client Name", name: name, widget: string }
+              - { label: "Role", name: role, widget: string }
+              - { label: "Country", name: country, widget: string }
+
+  # ============================================================
+  # About Page
+  # ============================================================
+  - name: about
+    label: About Page
+    description: Company story, milestones, culture, factory gallery and partners.
+    files:
+      - name: about
+        label: About Us Content
+        file: content/about/_index.md
+        media_folder: ""
+        public_folder: ""
+        fields:
+          - { label: "Page Title", name: title, widget: string }
+          - { label: "SEO Description", name: description, widget: text }
+          - { label: "Story — Eyebrow", name: intro_eyebrow, widget: string, required: false }
+          - { label: "Story — Title", name: intro_title, widget: string }
+          - { label: "Story — Text", name: intro_text, widget: text }
+          - { label: "Story — Image", name: intro_image, widget: image, required: false }
+          - { label: "Full Company Introduction (markdown)", name: body, widget: markdown, required: false }
+          - label: "Milestones Timeline"
+            name: milestones
+            widget: list
+            required: false
+            fields:
+              - { label: "Year", name: year, widget: string }
+              - { label: "Title", name: title, widget: string }
+              - { label: "Text", name: text, widget: text }
+          - label: "Culture Cards (Mission / Vision / Values)"
+            name: culture
+            widget: list
+            required: false
+            fields:
+              - label: "Icon"
+                name: icon
+                widget: select
+                options: [target, eye, handshake, leaf, sparkles, globe, users, shield-check, badge-check, award, factory, sun]
+              - { label: "Title", name: title, widget: string }
+              - { label: "Text", name: text, widget: text }
+          - label: "Factory Gallery"
+            name: gallery
+            widget: list
+            required: false
+            field: { label: "Image", name: image, widget: image }
+          - label: "Partner Brands"
+            name: partners
+            widget: list
+            required: false
+            field: { label: "Brand Name", name: brand, widget: string }
+
+  # ============================================================
+  # Product Categories (taxonomy term pages — /products/<category>/)
+  # ============================================================
+  - name: product_categories
+    label: Product Categories
+    label_singular: Product Category
+    description: Product lines shown on the home page, in navigation and as category pages at /products/<category>/.
+    folder: content/product_categories
+    path: "{{slug}}/_index"
+    create: true
+    media_folder: ""
+    public_folder: ""
+    summary: "{{title}}"
     fields:
-      - { label: Title, name: title, widget: string }
-      - { label: Date, name: date, widget: datetime, type: date }
-      - { label: Body, name: body, widget: richtext }
+      - { label: "Category Name", name: title, widget: string }
+      - { label: "Short Description (shown under the category title)", name: description, widget: text }
+      - { label: "Cover Image", name: cover, widget: image, required: false }
+      - { label: "Body (optional SEO text at the bottom of the category page)", name: body, widget: markdown, required: false }
+
+  # ============================================================
+  # Products (page bundles — /products/<slug>/)
+  # ============================================================
+  - name: products
+    label: Products
+    label_singular: Product
+    description: Product catalog. Each product is a page at /products/<slug>/ with its own image folder.
+    folder: content/products
+    path: "{{slug}}/index"
+    create: true
+    media_folder: ""
+    public_folder: ""
+    summary: "{{title}} · {{model}}"
+    sortable_fields: [title, model, date]
+    fields:
+      - { label: "Product Name", name: title, widget: string }
+      - { label: "Model / SKU", name: model, widget: string }
+      - label: "Category"
+        name: product_categories
+        widget: relation
+        collection: product_categories
+        search_fields: [title]
+        value_field: title
+        display_fields: [title]
+        multiple: true
+        required: true
+      - { label: "Featured on Home Page", name: featured, widget: boolean, default: false, required: false }
+      - { label: "Draft (hide from the site)", name: draft, widget: boolean, default: false, required: false }
+      - label: "Publish Date"
+        name: date
+        widget: datetime
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        format: "YYYY-MM-DD"
+      - { label: "SEO Description", name: description, widget: text, hint: "Shown in search results and social shares" }
+      - { label: "Short Description (product cards)", name: short_description, widget: text }
+      - label: "Product Images"
+        name: images
+        widget: list
+        hint: "The first image is the cover shown on cards. Uploaded images are stored next to the product page."
+        field: { label: "Image", name: image, widget: image }
+      - label: "Key Features"
+        name: features
+        widget: list
+        required: false
+        field: { label: "Feature", name: feature, widget: string }
+      - { label: "MOQ", name: moq, widget: string, required: false, hint: "e.g. 500 units" }
+      - label: "Packaging & Delivery"
+        name: packaging
+        widget: object
+        required: false
+        fields:
+          - { label: "Loading Port", name: loading_port, widget: string, required: false }
+          - { label: "Lead Time", name: lead_time, widget: string, required: false }
+          - { label: "Packaging Details", name: packaging_details, widget: text, required: false }
+          - { label: "Payment Terms", name: payment_terms, widget: string, required: false }
+      - label: "Specifications Table"
+        name: specifications
+        widget: list
+        required: false
+        fields:
+          - { label: "Spec Name", name: label, widget: string }
+          - { label: "Spec Value", name: value, widget: string }
+      - { label: "Product Description (main content)", name: body, widget: markdown, required: false }
+
+  # ============================================================
+  # Products Overview Page
+  # ============================================================
+  - name: products_page
+    label: Products Page
+    description: Title and intro of the /products/ catalog page.
+    files:
+      - name: overview
+        label: Products Overview
+        file: content/products/_index.md
+        fields:
+          - { label: "Page Title", name: title, widget: string }
+          - { label: "SEO Description", name: description, widget: text }
+          - { label: "Intro Text (bottom of the catalog page, markdown)", name: body, widget: markdown, required: false }
+
+  # ============================================================
+  # Certifications
+  # ============================================================
+  - name: certifications
+    label: Certifications
+    description: Company certificates shown on the Certifications page and the home page teaser.
+    files:
+      - name: certifications
+        label: Certifications Page
+        file: content/certifications/_index.md
+        media_folder: ""
+        public_folder: ""
+        fields:
+          - { label: "Page Title", name: title, widget: string }
+          - { label: "SEO Description", name: description, widget: text }
+          - { label: "Intro Text", name: intro, widget: text }
+          - label: Certificates
+            name: certificates
+            widget: list
+            fields:
+              - { label: "Certificate Name", name: title, widget: string }
+              - { label: "Issued By", name: issuer, widget: string }
+              - { label: "Issue Date", name: issue_date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, format: "YYYY-MM-DD", required: false }
+              - { label: "Expiry Date", name: expiry_date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false, format: "YYYY-MM-DD", required: false, hint: "Leave empty for long-term validity" }
+              - { label: "Certificate Image (optional)", name: image, widget: image, required: false, hint: "Upload a scan — shown instead of the generated seal" }
+              - { label: "PDF (optional)", name: pdf, widget: file, required: false }
+              - { label: "Description", name: description, widget: text, required: false }
+
+  # ============================================================
+  # Contact Page
+  # ============================================================
+  - name: contact
+    label: Contact Page
+    description: Contact page intro and FAQ. Phone, email and map come from Site Settings.
+    files:
+      - name: contact
+        label: Contact Page Content
+        file: content/contact/_index.md
+        fields:
+          - { label: "Page Title", name: title, widget: string }
+          - { label: "SEO Description", name: description, widget: text }
+          - { label: "Intro Text", name: intro, widget: text }
+          - label: "FAQ Items"
+            name: faq
+            widget: list
+            required: false
+            fields:
+              - { label: "Question", name: question, widget: string }
+              - { label: "Answer", name: answer, widget: text }

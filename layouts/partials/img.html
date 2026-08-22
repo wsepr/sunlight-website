@@ -1,0 +1,44 @@
+{{- /*
+Responsive image with Hugo image processing → WebP srcset.
+Params (dict):
+  page   — page object (resource lookup)
+  name   — resource name ("main.jpg") or static path ("/images/x.png")
+  alt    — alt text
+  class  — img classes
+  widths — slice of widths, default (400 800)
+  sizes  — sizes attr
+  eager  — LCP image (no lazy, fetchpriority=high)
+*/ -}}
+{{- $name := .name -}}
+{{- $alt := .alt | default "" -}}
+{{- $class := .class | default "" -}}
+{{- $widths := .widths | default (slice 400 800) -}}
+{{- $sizes := .sizes | default "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" -}}
+{{- $eager := .eager | default false -}}
+{{- if and $name (hasPrefix $name "/") -}}
+  <img src="{{ $name | relURL }}" alt="{{ $alt }}" class="{{ $class }}" {{ if $eager }}fetchpriority="high" decoding="sync"{{ else }}loading="lazy" decoding="async"{{ end }}>
+{{- else if $name -}}
+  {{- with .page.Resources.GetMatch $name -}}
+    {{- $img := . -}}
+    {{- $srcset := "" -}}
+    {{- $srcURL := "" -}}
+    {{- range $w := $widths -}}
+      {{- if le $w $img.Width -}}
+        {{- $r := $img.Process (printf "resize %dx webp q82" $w) -}}
+        {{- $srcset = printf "%s%s %dw, " $srcset $r.RelPermalink $w -}}
+        {{- $srcURL = $r.RelPermalink -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if not $srcURL -}}
+      {{- $r := .Process "resize 400x webp q82" -}}
+      {{- $srcset = printf "%s%s %dw, " $srcset $r.RelPermalink .Width -}}
+      {{- $srcURL = $r.RelPermalink -}}
+    {{- end -}}
+    {{- $srcset = strings.TrimSuffix ", " $srcset -}}
+    <img src="{{ $srcURL }}" srcset="{{ $srcset }}" sizes="{{ $sizes }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ $alt }}" class="{{ $class }}" {{ if $eager }}fetchpriority="high" decoding="sync"{{ else }}loading="lazy" decoding="async"{{ end }}>
+  {{- else -}}
+    <span class="flex h-full w-full items-center justify-center bg-mist-2 text-navy-600/30" aria-hidden="true">{{ partial "icon.html" "image" }}</span>
+  {{- end -}}
+{{- else -}}
+  <span class="flex h-full w-full items-center justify-center bg-mist-2 text-navy-600/30" aria-hidden="true">{{ partial "icon.html" "image" }}</span>
+{{- end -}}

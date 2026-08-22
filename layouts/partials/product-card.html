@@ -1,0 +1,42 @@
+{{- /* Params: dict "p" product page */ -}}
+{{- $p := .p -}}
+{{- $cats := $p.Params.product_categories | default slice -}}
+{{- $cat := "" }}{{ with index $cats 0 }}{{ $cat = . }}{{ end -}}
+{{- $catSlug := $cat | urlize -}}
+{{- $imgName := index ($p.Params.images | default slice) 0 -}}
+{{- $thumb := "" -}}
+{{- with $p.Resources.GetMatch ($imgName | default "") }}{{ $thumb = (.Process "resize 160x webp q75").RelPermalink }}{{ end -}}
+<article
+  class="pcard group"
+  data-cat="{{ $catSlug }}"
+  data-name="{{ $p.Title }}"
+  data-model="{{ $p.Params.model }}"
+  data-date="{{ $p.Date.Format "2006-01-02" }}"
+>
+  <a href="{{ $p.RelPermalink }}" class="pcard-img" aria-label="{{ $p.Title }}">
+    {{- partial "img.html" (dict "page" $p "name" $imgName "alt" $p.Title "sizes" "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw") -}}
+    {{- with $cat }}<span class="pcard-tag">{{ . }}</span>{{ end }}
+  </a>
+  <div class="flex flex-1 flex-col p-5">
+    <h3 class="font-display text-base leading-snug font-bold text-navy-900">
+      <a href="{{ $p.RelPermalink }}" class="transition-colors hover:text-navy-600">{{ $p.Title }}</a>
+    </h3>
+    <p class="pcard-model mt-0.5">{{ $p.Params.model }}</p>
+    <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-ink-soft">{{ $p.Params.short_description }}</p>
+    <div class="mt-auto flex items-center gap-2 pt-4">
+      <button
+        type="button"
+        class="add-inquiry btn btn-outline btn-sm flex-1"
+        data-id="{{ $p.RelPermalink }}"
+        data-name="{{ $p.Title }}"
+        data-model="{{ $p.Params.model }}"
+        data-url="{{ $p.RelPermalink }}"
+        data-img="{{ $thumb }}"
+        data-added="{{ i18n "product.added" }}"
+      >
+        {{ partial "icon.html" "plus" }} {{ i18n "product.add_to_inquiry" }}
+      </button>
+      <a href="{{ $p.RelPermalink }}#inquiry-form" class="btn btn-navy btn-sm flex-1">{{ i18n "product.send_inquiry" }}</a>
+    </div>
+  </div>
+</article>
