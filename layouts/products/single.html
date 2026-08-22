@@ -7,8 +7,6 @@
 {{- $primary := index $imgs 0 -}}
 {{- $cats := .Params.product_categories | default slice -}}
 {{- $catName := index $cats 0 -}}
-{{- $thumb := "" -}}
-{{- with $primary }}{{ $thumb = (.Process "resize 160x webp q75").RelPermalink }}{{ end -}}
 {{- $wa := printf "https://wa.me/%s?text=%s" (replace $s.contact.whatsapp "+" "") (urlquery (printf "Hello, I'm interested in %s (Model: %s). Could you send me more details?" .Title .Params.model)) -}}
 
 <section class="pt-28 pb-6 md:pt-32">
@@ -87,17 +85,6 @@
       </div>
 
       <div class="mt-7 flex flex-col gap-3 sm:flex-row">
-        <button type="button"
-          class="add-inquiry btn btn-gold flex-1"
-          data-id="{{ .RelPermalink }}"
-          data-name="{{ .Title }}"
-          data-model="{{ .Params.model }}"
-          data-url="{{ .RelPermalink }}"
-          data-img="{{ $thumb }}"
-          data-added="{{ i18n "product.added" }}"
-        >
-          {{ partial "icon.html" "plus" }} {{ i18n "product.add_to_inquiry" }}
-        </button>
         <a href="#inquiry-form" class="btn btn-navy flex-1">{{ partial "icon.html" "send" }} {{ i18n "product.send_inquiry" }}</a>
         <a href="{{ $wa }}" class="btn btn-outline" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
           {{ partial "icon.html" "whatsapp" }}

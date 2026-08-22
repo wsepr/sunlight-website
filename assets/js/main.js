@@ -101,147 +101,11 @@
     }
   }
 
-  /* ---------- Toast ---------- */
-  const toast = $("#toast");
-  let toastTimer;
-  const showToast = (msg) => {
-    if (!toast) return;
-    toast.textContent = msg;
-    toast.classList.remove("hidden");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.add("hidden"), 2200);
-  };
-
-  /* ---------- Inquiry cart ---------- */
-  const CART_KEY = "sw_inquiry_cart";
-  const loadCart = () => {
-    try {
-      return JSON.parse(localStorage.getItem(CART_KEY)) || [];
-    } catch {
-      return [];
-    }
-  };
-  const saveCart = (items) => {
-    try {
-      localStorage.setItem(CART_KEY, JSON.stringify(items));
-    } catch {}
-  };
-
-  let cart = loadCart();
-  const badges = $$(".cart-count");
-  const fabCart = $("#fabCart");
-  const fabCartBadge = $("#fabCartBadge");
-
-  const renderBadge = () => {
-    const n = cart.reduce((a, i) => a + i.qty, 0);
-    badges.forEach((b) => (b.textContent = String(n)));
-    $$(".cart-count-wrap").forEach((w) => w.classList.toggle("hidden", n === 0));
-    if (fabCart) {
-      fabCart.classList.toggle("hidden", n === 0);
-      if (fabCartBadge) fabCartBadge.textContent = String(n);
-    }
-  };
-
-  const drawer = $("#inquiryDrawer");
-  const drawerBackdrop = $("#drawerBackdrop");
-  const drawerBody = $("#drawerItems");
-  $("#cartClear")?.addEventListener("click", () => {
-    cart = [];
-    saveCart(cart);
-    renderBadge();
-    renderDrawer();
-  });
-  const setDrawerOpen = (open) => {
-    if (!drawer) return;
-    drawer.classList.toggle("open", open);
-    drawerBackdrop?.classList.toggle("hidden", !open);
-    drawer.setAttribute("aria-hidden", String(!open));
-    document.body.style.overflow = open ? "hidden" : "";
-    if (open) renderDrawer();
-  };
-  $$(".open-cart").forEach((b) => b.addEventListener("click", () => setDrawerOpen(true)));
-  $("#drawerClose")?.addEventListener("click", () => setDrawerOpen(false));
-  drawerBackdrop?.addEventListener("click", () => setDrawerOpen(false));
-
-  const renderDrawer = () => {
-    if (!drawerBody) return;
-    if (!cart.length) {
-      drawerBody.innerHTML = `
-        <div class="flex flex-1 flex-col items-center justify-center gap-3 px-8 py-16 text-center">
-          <span class="flex h-16 w-16 items-center justify-center rounded-full bg-mist text-navy-600">${$("#iconBag")?.innerHTML || ""}</span>
-          <p class="font-display text-lg font-bold text-navy-900">${drawerBody.dataset.empty}</p>
-          <p class="text-sm text-ink-soft">${drawerBody.dataset.emptyHint}</p>
-          <a href="${drawerBody.dataset.productsUrl}" class="btn btn-navy btn-sm mt-2">${drawerBody.dataset.browse}</a>
-        </div>`;
-      return;
-    }
-    drawerBody.innerHTML = cart
-      .map(
-        (i) => `
-      <li class="flex gap-3 border-b border-line py-4">
-        <a href="${i.url}" class="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-mist-2">
-          ${i.img ? `<img src="${i.img}" alt="" class="h-full w-full object-cover" loading="lazy">` : ""}
-        </a>
-        <div class="min-w-0 flex-1">
-          <a href="${i.url}" class="font-display text-sm font-bold text-navy-900 hover:underline">${i.name}</a>
-          ${i.model ? `<p class="font-mono text-xs text-gold-600">${i.model}</p>` : ""}
-          <div class="mt-2 flex items-center justify-between">
-            <div class="inline-flex items-center rounded-lg border border-line" role="group" aria-label="Quantity">
-              <button type="button" class="qty-btn flex h-7 w-7 items-center justify-center text-ink-soft hover:text-navy-900" data-id="${i.id}" data-d="-1" aria-label="Decrease">−</button>
-              <span class="w-8 text-center text-sm font-bold tabular-nums">${i.qty}</span>
-              <button type="button" class="qty-btn flex h-7 w-7 items-center justify-center text-ink-soft hover:text-navy-900" data-id="${i.id}" data-d="1" aria-label="Increase">+</button>
-            </div>
-            <button type="button" class="rm-btn text-xs font-semibold text-ink-soft underline-offset-2 hover:text-red-600 hover:underline" data-id="${i.id}">${drawerBody.dataset.remove}</button>
-          </div>
-        </div>
-      </li>`
-      )
-      .join("");
-    $$(".qty-btn", drawerBody).forEach((b) =>
-      b.addEventListener("click", () => {
-        const item = cart.find((x) => x.id === b.dataset.id);
-        if (!item) return;
-        item.qty = Math.max(1, item.qty + parseInt(b.dataset.d, 10));
-        saveCart(cart);
-        renderBadge();
-        renderDrawer();
-      })
-    );
-    $$(".rm-btn", drawerBody).forEach((b) =>
-      b.addEventListener("click", () => {
-        cart = cart.filter((x) => x.id !== b.dataset.id);
-        saveCart(cart);
-        renderBadge();
-        renderDrawer();
-      })
-    );
-  };
-
-  const addToCart = (btn) => {
-    const item = {
-      id: btn.dataset.id,
-      name: btn.dataset.name,
-      model: btn.dataset.model || "",
-      url: btn.dataset.url,
-      img: btn.dataset.img || "",
-      qty: 1,
-    };
-    const existing = cart.find((x) => x.id === item.id);
-    if (existing) existing.qty += 1;
-    else cart.push(item);
-    saveCart(cart);
-    renderBadge();
-    showToast(btn.dataset.added || "Added to inquiry");
-  };
-  $$(".add-inquiry").forEach((b) => b.addEventListener("click", () => addToCart(b)));
-
-  renderBadge();
-
   /* ---------- Forms ---------- */
   const endpoint = document.body.dataset.endpoint || "";
   const email = document.body.dataset.email || "";
 
-  const buildBody = (form, extraLines) => {
+  const buildBody = (form) => {
     const data = new FormData(form);
     const lines = [];
     for (const [k, v] of data.entries()) {
@@ -249,7 +113,6 @@
       const label = form.querySelector(`[name="${k}"]`)?.dataset.label || k;
       lines.push(`${label}: ${v}`);
     }
-    if (extraLines?.length) lines.push(...extraLines);
     return lines.join("\n");
   };
 
@@ -261,7 +124,6 @@
       return;
     }
     const submitBtn = form.querySelector('button[type="submit"]');
-    const cartLines = cart.map((i) => `• ${i.name}${i.model ? ` (${i.model})` : ""} × ${i.qty} — ${i.url}`);
     const subject = `${document.body.dataset.site} — Inquiry from ${form.querySelector('[name="name"]')?.value || "website"}`;
     if (endpoint) {
       submitBtn.disabled = true;
@@ -272,23 +134,16 @@
           headers: { "Content-Type": "application/json", Accept: "application/json" },
           body: JSON.stringify({
             subject,
-            body: buildBody(form, cartLines),
-            cart: cart.map((i) => ({ name: i.name, model: i.model, qty: i.qty, url: i.url })),
+            body: buildBody(form),
           }),
         });
       } catch {}
       showSuccess(form);
-      cart = [];
-      saveCart(cart);
-      renderBadge();
       return;
     }
-    const href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(buildBody(form, cartLines))}`;
+    const href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(buildBody(form))}`;
     window.location.href = href;
     showSuccess(form);
-    cart = [];
-    saveCart(cart);
-    renderBadge();
   };
 
   const showSuccess = (form) => {
@@ -434,7 +289,6 @@
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeLightbox();
-      setDrawerOpen(false);
       closeMenu();
     }
   });

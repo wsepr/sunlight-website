@@ -9,7 +9,6 @@ nav:
   language: "EN"
   open_menu: "Open menu"
   close_menu: "Close menu"
-  inquiry_cart: "Inquiry cart"
   home_title: "Home"
 
 hero:
@@ -33,7 +32,6 @@ home:
 product:
   model: "Model"
   moq: "MOQ"
-  add_to_inquiry: "Add to Inquiry"
   send_inquiry: "Send Inquiry"
   inquiry_now: "Send Inquiry"
   specifications: "Specifications"
@@ -52,7 +50,6 @@ product:
   share: "Share"
   zoom: "Zoom"
   download_pdf: "Download PDF"
-  added: "Added to inquiry"
   category_label: "Category"
   products_count: "Products"
   filter_by: "Filter by category"
@@ -61,19 +58,6 @@ product:
   packaging: "Packaging"
   payment: "Payment Terms"
   supply_ability: "Supply Ability"
-
-cart:
-  title: "Inquiry List"
-  empty: "Your inquiry list is empty"
-  empty_hint: "Browse products and add the ones you are interested in."
-  browse_products: "Browse Products"
-  your_message: "Your message (optional)"
-  clear: "Clear all"
-  send_inquiry: "Send Inquiry to Us"
-  items: "items"
-  remove: "Remove"
-  close: "Close"
-  qty: "Qty"
 
 form:
   name: "Your Name"
@@ -90,7 +74,6 @@ form:
   success_text: "Our export team will reply within 24 hours on business days."
   err_required: "This field is required"
   err_email: "Please enter a valid email address"
-  about_products: "Product catalog request"
 
 contact:
   contact_info: "Contact Information"
@@ -127,6 +110,7 @@ footer:
   all_rights: "All rights reserved."
 
 misc:
+  close: "Close"
   back_to_top: "Back to top"
   whatsapp_chat: "Chat on WhatsApp"
   breadcrumb_home: "Home"

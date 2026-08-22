@@ -1,6 +1,5 @@
 {{- $s := hugo.Data.settings -}}
 {{- $wa := printf "https://wa.me/%s?text=%s" (replace $s.contact.whatsapp "+" "") (printf "Hello %s, I have an inquiry about your products." $s.company.short_name | urlquery) -}}
-<span id="iconBag" class="hidden">{{ partial "icon.html" "bag" }}</span>
 
 <div class="fab-stack">
   <button type="button" id="backToTop" class="fab fab-top hidden" aria-label="{{ i18n "misc.back_to_top" }}">
@@ -9,79 +8,15 @@
   <a href="{{ $wa }}" class="fab fab-wa" target="_blank" rel="noopener noreferrer" aria-label="{{ i18n "misc.whatsapp_chat" }}">
     {{ partial "icon.html" "whatsapp" }}
   </a>
-  <button type="button" id="fabCart" class="fab fab-cart relative hidden items-center gap-2 open-cart">
-    {{ partial "icon.html" "bag" }}
-    <span>{{ i18n "nav.inquiry_cart" }}</span>
-    <span class="fab-badge" id="fabCartBadge">0</span>
-  </button>
 </div>
-
-{{- /* Inquiry cart drawer */}}
-<div id="drawerBackdrop" class="drawer-backdrop hidden" aria-hidden="true"></div>
-<aside id="inquiryDrawer" class="drawer" aria-hidden="true" role="dialog" aria-modal="true" aria-label="{{ i18n "cart.title" }}">
-  <div class="flex items-center justify-between border-b border-line px-5 py-4">
-    <h2 class="font-display text-lg font-extrabold text-navy-900">
-      {{ i18n "cart.title" }}
-      <span class="ml-1 text-sm font-bold text-ink-soft">(<span class="cart-count">0</span> {{ i18n "cart.items" }})</span>
-    </h2>
-    <button type="button" id="drawerClose" class="icon-btn" aria-label="{{ i18n "cart.close" }}">
-      {{ partial "icon.html" "x" }}
-    </button>
-  </div>
-
-  <ul
-    id="drawerItems"
-    class="flex-1 overflow-y-auto px-5"
-    data-empty="{{ i18n "cart.empty" }}"
-    data-empty-hint="{{ i18n "cart.empty_hint" }}"
-    data-products-url="{{ "products/" | relURL }}"
-    data-browse="{{ i18n "cart.browse_products" }}"
-    data-remove="{{ i18n "cart.remove" }}"
-  ></ul>
-
-  <div class="border-t border-line p-5">
-    <div>
-      <form class="inquiry-form space-y-3" novalidate>
-        <input type="text" name="company_website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <div>
-          <label class="field-label" for="cart-name">{{ i18n "form.name" }} *</label>
-          <input class="field-input" id="cart-name" name="name" type="text" data-label="Name" required autocomplete="name">
-        </div>
-        <div>
-          <label class="field-label" for="cart-email">{{ i18n "form.email" }} *</label>
-          <input class="field-input" id="cart-email" name="email" type="email" data-label="Email" required autocomplete="email">
-        </div>
-        <div>
-          <label class="field-label" for="cart-msg">{{ i18n "cart.your_message" }}</label>
-          <textarea class="field-input" id="cart-msg" name="message" rows="2" data-label="Message"></textarea>
-        </div>
-        <input type="hidden" name="product_interest" value="{{ i18n "form.about_products" }}">
-        <button type="submit" class="btn btn-gold w-full">
-          {{ partial "icon.html" "send" }} {{ i18n "cart.send_inquiry" }}
-        </button>
-      </form>
-      <div class="form-success hidden rounded-xl bg-mist p-6 text-center">
-        <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gold-500 text-navy-950">{{ partial "icon.html" "check" }}</span>
-        <p class="mt-3 font-display text-base font-bold text-navy-900">{{ i18n "form.success_title" }}</p>
-        <p class="mt-1 text-sm text-ink-soft">{{ i18n "form.success_text" }}</p>
-      </div>
-    </div>
-    <button type="button" id="cartClear" class="mt-3 w-full text-xs font-semibold text-ink-soft underline-offset-2 hover:text-red-600 hover:underline">
-      {{ i18n "cart.clear" }}
-    </button>
-  </div>
-</aside>
 
 {{- /* Lightbox */}}
 <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
   <img id="lightboxImg" alt="">
-  <button type="button" id="lightboxClose" class="absolute top-5 right-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25" aria-label="{{ i18n "cart.close" }}">
+  <button type="button" id="lightboxClose" class="absolute top-5 right-5 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25" aria-label="{{ i18n "misc.close" }}">
     {{ partial "icon.html" "x" }}
   </button>
 </div>
-
-{{- /* Toast */}}
-<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
 {{- /* Optional live chat script (Tawk.to / LiveChat) — set URL in Site Settings */}}
 {{- with $s.chat_url }}
